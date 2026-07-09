@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вира Маина — Клуб автокрановщиков Костаная</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/" class="active">Главная</a></li>
+      <li><a href="/colleagues.html">Спецтехника</a></li>
+      <li><a href="/marketplace.html">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html">Материалы</a></li>
+      <li><a href="/about.html">О нас</a></li>
+      <li><a href="/admin.html">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero" class="hero-banner"></section>
+
+  <!-- FEATURES -->
+  <section style="background: var(--gray-bg); text-align: center;">
+    <h2 class="section-title">Наши задачи</h2>
+    <p class="section-subtitle">То, ради чего мы объединились</p>
+    <div class="tasks-grid">
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Сплотиться и помогать друг другу</h3>
+        <p>Работаем и живём рядом — держимся друг за друга в деле и в жизни</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Адекватные цены</h3>
+        <p>Не демпингуем и не роняем расценки в ущерб коллегам по цеху</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Защита от недобросовестных заказчиков</h3>
+        <p>Не даём в обиду друг друга — черный список и общая поддержка</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Взаимопомощь</h3>
+        <p>Поддержка при ЧП, поломке техники, болезни или семейных обстоятельствах</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Прозрачность</h3>
+        <p>Баланс общего фонда и итоги голосований видны каждому участнику</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 12px;">Обмен опытом</h3>
+        <p>Общая база знаний: ремонт техники, законы РК, инструкции по ТБ</p>
+      </div>
+    </div>
+    <a href="/about.html" class="about-more-link">Подробнее об объединении →</a>
+  </section>
+
+  <footer style="background: var(--black); color: var(--white); padding: 40px 60px; text-align: center; margin-top: 80px;">
+    <p>&copy; 2026 Общественное объединение автокрановщиков Костанайской области «ВИРА МАИНА». Все права защищены.</p>
+  </footer>
+
+</body>
+</html>

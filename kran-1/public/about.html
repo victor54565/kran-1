@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>О нас - Вира Маина</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Главная</a></li>
+      <li><a href="/colleagues.html">Спецтехника</a></li>
+      <li><a href="/marketplace.html">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html">Материалы</a></li>
+      <li><a href="/about.html" class="active">О нас</a></li>
+      <li><a href="/admin.html">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- MISSION -->
+  <section style="background: var(--white);">
+    <h2 class="section-title">О нас</h2>
+    <p class="section-subtitle">От чата в WhatsApp — к официальному объединению автокрановщиков Костаная</p>
+    <p style="max-width: 780px; line-height: 1.8; font-size: 15px;">
+      Мы объединились, чтобы сплотиться, и развиваться как дружное сообщество, держать адекватные цены на услуги и помогать друг другу в сложных ситуациях.
+    </p>
+  </section>
+
+  <!-- STRUCTURE -->
+  <section style="background: linear-gradient(180deg, #fff6e8 0%, #ffedd1 100%);">
+    <h2 class="section-title">Как устроено управление</h2>
+    <p class="section-subtitle">Ключевые положения устава — коротко и ясно</p>
+    <div class="grid">
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Некоммерческая организация</h3>
+        <p>У объединения нет цели зарабатывать на участниках. Все средства фонда идут только на цели сообщества и взаимопомощь.</p>
+      </div>
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Общее собрание — высший орган</h3>
+        <p>Главный в объединении не председатель, а общее собрание участников. Только общим голосованием принимаются решения о взносах, тратах фонда, изменении правил и переизбрании руководителя.</p>
+      </div>
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Роль председателя</h3>
+        <p>Председатель избирается голосованием, представляет объединение в госорганах и технически управляет счетом. Переводить деньги он может только по протоколу голосования — самовольные траты запрещены уставом.</p>
+      </div>
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Кто может быть членом</h3>
+        <p>Любой действующий крановщик, который разделяет наши цели, состоит в сообществе, вносит вклад в сообщество и соблюдает профессиональную этику, включая честные цены.</p>
+      </div>
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Фонд взаимопомощи</h3>
+        <p>Формируется из добровольных взносов участников. Используется для помощи при ЧП, поломке техники, болезни или оплаты общего юриста.</p>
+      </div>
+      <div class="card about-card">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">Открытая отчетность</h3>
+        <p>Движение денег на счете объединения доступно каждому участнику в любой момент — актуальный баланс и история публикуются на сайте в разделе «Касса».</p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

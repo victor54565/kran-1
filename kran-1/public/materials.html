@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Материалы - Клуб Крановщиков</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Главная</a></li>
+      <li><a href="/colleagues.html">Спецтехника</a></li>
+      <li><a href="/marketplace.html">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html" class="active">Материалы</a></li>
+      <li><a href="/about.html">О нас</a></li>
+      <li><a href="/admin.html">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- SECTION -->
+  <section style="background: var(--white);">
+    <h2 class="section-title">Полезные материалы</h2>
+    <p class="section-subtitle">Видеоруководства, статьи, инструкции по ремонту и технике безопасности</p>
+
+    <div class="filter-bar" style="margin-bottom: 40px;">
+      <button class="filter-btn active" data-type="" onclick="filterByType('', this)">Все материалы</button>
+      <button class="filter-btn" data-type="video" onclick="filterByType('video', this)">Видео</button>
+      <button class="filter-btn" data-type="article" onclick="filterByType('article', this)">Статьи</button>
+      <button class="filter-btn" data-type="pdf" onclick="filterByType('pdf', this)">PDF</button>
+    </div>
+
+    <div id="materialsList" class="grid"></div>
+  </section>
+
+  <script>
+    let allMaterials = [];
+
+    async function loadMaterials() {
+      try {
+        const res = await fetch('/api/materials');
+        allMaterials = await res.json();
+        renderMaterials(allMaterials);
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function renderMaterials(materials) {
+      const list = document.getElementById('materialsList');
+      list.innerHTML = '';
+
+      materials.forEach(material => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        let button = '';
+
+        if (material.type === 'video') {
+          button = `<a href="${material.url}" target="_blank" class="btn-primary" style="width: 100%;">Смотреть на YouTube</a>`;
+        } else if (material.type === 'article') {
+          button = `<a href="${material.url}" class="btn-primary" style="width: 100%;">Читать статью</a>`;
+        } else if (material.type === 'pdf') {
+          button = `<a href="${material.url}" target="_blank" class="btn-primary" style="width: 100%;">Скачать PDF</a>`;
+        }
+
+        card.innerHTML = `
+          <h3 style="margin-bottom: 8px; font-size: 18px;">
+            ${material.title}
+          </h3>
+          <p style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">
+            ${material.type === 'video' ? 'Видео' : material.type === 'article' ? 'Статья' : 'PDF'}
+          </p>
+          <p style="margin-bottom: 16px; line-height: 1.6;">
+            ${material.description}
+          </p>
+          ${button}
+        `;
+        list.appendChild(card);
+      });
+
+      if (materials.length === 0) {
+        list.innerHTML = '<p class="empty-state">Материалов нет. Скоро появятся!</p>';
+      }
+    }
+
+    function filterByType(type, btn) {
+      document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = type ? allMaterials.filter(m => m.type === type) : allMaterials;
+      renderMaterials(filtered);
+    }
+
+    loadMaterials();
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Барахолка - Вира Маина</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Главная</a></li>
+      <li><a href="/colleagues.html">Спецтехника</a></li>
+      <li><a href="/marketplace.html" class="active">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html">Материалы</a></li>
+      <li><a href="/about.html">О нас</a></li>
+      <li><a href="/admin.html">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- SECTION -->
+  <section style="background: var(--white);">
+    <h2 class="section-title">Барахолка</h2>
+    <p class="section-subtitle">Покупай, продавай и обменивай запчасти, тросы, масло и другое</p>
+
+    <div class="filter-bar" id="categoryFilterBar" style="margin-bottom: 32px;">
+      <button class="filter-btn active" data-cat="" onclick="filterByCategory('', this)">Все</button>
+      <button class="filter-btn" data-cat="Тросы" onclick="filterByCategory('Тросы', this)">Тросы</button>
+      <button class="filter-btn" data-cat="Масла и жидкости" onclick="filterByCategory('Масла и жидкости', this)">Масла и жидкости</button>
+      <button class="filter-btn" data-cat="Запчасти" onclick="filterByCategory('Запчасти', this)">Запчасти</button>
+      <button class="filter-btn" data-cat="Техника" onclick="filterByCategory('Техника', this)">Техника</button>
+      <button class="filter-btn" data-cat="Прочее" onclick="filterByCategory('Прочее', this)">Прочее</button>
+    </div>
+
+    <div class="listing-zone">
+      <div id="marketplaceList" class="grid"></div>
+    </div>
+  </section>
+
+  <script>
+    let allAds = [];
+
+    function waLink(phone) {
+      let digits = (phone || '').replace(/\D/g, '');
+      if (digits.length === 11 && digits[0] === '8') digits = '7' + digits.slice(1);
+      return `https://wa.me/${digits}`;
+    }
+
+    async function loadMarketplace() {
+      try {
+        const res = await fetch('/api/marketplace');
+        allAds = await res.json();
+        applyFilter();
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    const STANDARD_CATEGORIES = ['Тросы', 'Масла и жидкости', 'Запчасти', 'Техника'];
+    let currentCategoryFilter = '';
+
+    function renderMarketplace(ads) {
+      const list = document.getElementById('marketplaceList');
+      list.innerHTML = '';
+
+      ads.forEach(ad => {
+        const card = document.createElement('div');
+        card.className = 'card listing-card';
+        const date = new Date(ad.createdAt).toLocaleDateString('ru-RU');
+        const photoHtml = ad.photo
+          ? `<img class="card-photo-single" src="/uploads/${ad.photo}" alt="${ad.title}" onclick="window.open('/uploads/${ad.photo}', '_blank')">`
+          : '<div class="card-photo-placeholder"></div>';
+
+        card.innerHTML = `
+          ${photoHtml}
+          <span class="category-badge">${ad.category}</span>
+          <h3 style="margin: 10px 0 4px; color: var(--black);">${ad.title}</h3>
+          <p style="color: var(--text-light); font-size: 13px; margin-bottom: 12px;">${date}</p>
+          <p style="margin-bottom: 16px;">${ad.description}</p>
+
+          <div style="background: var(--yellow); color: var(--white); padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 12px;">
+            <strong style="font-size: 20px;">${Number(ad.price).toLocaleString('ru-RU')} ₸</strong>
+          </div>
+
+          <div style="background: var(--gray-bg); padding: 12px; border-radius: 6px;">
+            <p style="margin-bottom: 8px;"><strong>${ad.name}</strong></p>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <a href="tel:${ad.phone}" style="color: var(--yellow-dark); text-decoration: none; font-weight: 600;">${ad.phone}</a>
+              <a href="${waLink(ad.phone)}" target="_blank" class="btn-whatsapp">Написать</a>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      if (ads.length === 0) {
+        list.innerHTML = '<p class="empty-state">Объявлений нет.</p>';
+      }
+    }
+
+    function filterByCategory(category, btn) {
+      currentCategoryFilter = category;
+      document.querySelectorAll('#categoryFilterBar .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter();
+    }
+
+    function applyFilter() {
+      let filtered = allAds;
+      if (currentCategoryFilter === 'Прочее') {
+        filtered = allAds.filter(ad => !STANDARD_CATEGORIES.includes(ad.category));
+      } else if (currentCategoryFilter) {
+        filtered = allAds.filter(ad => ad.category === currentCategoryFilter);
+      }
+      renderMarketplace(filtered);
+    }
+
+    loadMarketplace();
+  </script>
+</body>
+</html>
