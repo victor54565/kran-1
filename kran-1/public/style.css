@@ -316,31 +316,46 @@ th { background: var(--gray-bg); font-weight: 600; }
 
 /* ============ RESPONSIVE ============ */
 
-/* Планшеты и низ — включаем бургер-меню */
+/* Планшеты и телефоны — все пункты видны сразу (без бургера) */
 @media (max-width: 900px) {
   :root { --nav-h: 78px; }
-  nav { padding: 0 12px; gap: 8px; }
-  .nav-brand { flex: 1 1 auto; min-width: 0; }
-  .nav-logo img { height: 65px; width: 65px; }
+
+  /* Шапка в две строки: бренд сверху, кнопки снизу */
+  nav {
+    position: sticky; top: 0; height: auto;
+    flex-direction: column; align-items: stretch;
+    gap: 10px; padding: 10px 12px;
+  }
+  .nav-brand { flex: 0 0 auto; min-width: 0; justify-content: center; gap: 10px; }
+  .nav-logo img { height: 56px; width: 56px; }
   .nav-brand-text {
-    font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 15px; line-height: 1.2; text-align: center;
+    white-space: normal; overflow: visible; text-overflow: clip;
   }
 
-  .nav-toggle { display: flex; flex-shrink: 0; }
+  /* Прячем бургер — он больше не нужен */
+  .nav-toggle { display: none; }
 
-  /* Выпадающее меню */
+  /* Кнопки навигации: пилюли, перенос по рядам, всё на виду */
   .nav-links {
-    position: absolute; top: var(--nav-h); left: 0; right: 0;
-    flex-direction: column; gap: 0; flex-wrap: nowrap;
-    background: var(--white); box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+    position: static; flex-direction: row; flex-wrap: wrap;
+    justify-content: center; gap: 8px;
+    max-height: none; overflow: visible;
+    background: transparent; box-shadow: none;
+    padding-top: 10px; border-top: 1px solid var(--border);
   }
-  .nav-links.open { max-height: 80vh; overflow-y: auto; }
-  .nav-links li { width: 100%; border-top: 1px solid var(--border); }
+  .nav-links li { width: auto; border-top: none; }
   .nav-links a {
-    display: block; padding: 16px 24px; font-size: 16px;
+    display: block; padding: 9px 15px; font-size: 14px; font-weight: 600;
+    line-height: 1; border-radius: 22px;
+    background: var(--gray-bg); color: var(--text);
+    white-space: nowrap; transition: background 0.15s, color 0.15s;
   }
-  .nav-links a:hover { background: var(--gray-bg); }
+  .nav-links a:hover { background: #ececec; color: var(--yellow-dark); }
+  .nav-links a.active { background: var(--yellow); color: var(--white); }
+
+  /* Баннер вплотную под шапкой (шапка теперь в потоке) */
+  #hero { margin-top: 0; }
 
   /* Секции: строки "подзаголовок + кнопка" переносим в столбец */
   .section-head {
@@ -388,12 +403,13 @@ th { background: var(--gray-bg); font-weight: 600; }
 /* Маленькие телефоны */
 @media (max-width: 480px) {
   :root { --nav-h: 72px; }
-  nav { padding: 0 8px; }
-  .nav-logo img { height: 60px; width: 60px; }
+  nav { padding: 10px 8px; }
+  .nav-logo img { height: 50px; width: 50px; }
   .nav-brand-desktop { display: none; }
   .nav-brand-mobile { display: block; }
-  .nav-brand-text { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .nav-links a { font-size: 14px; }
+  .nav-brand-text { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-links { gap: 5px; padding-top: 8px; }
+  .nav-links a { padding: 7px 11px; font-size: 12px; }
 
   section { padding: 36px 16px; }
   .section-title { font-size: 22px; }
