@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ панель - Клуб Крановщиков</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Главная</a></li>
+      <li><a href="/colleagues.html">Спецтехника</a></li>
+      <li><a href="/marketplace.html">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html">Материалы</a></li>
+      <li><a href="/about.html">О нас</a></li>
+      <li><a href="/admin.html" class="active">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- LOGIN FORM -->
+  <section id="loginSection" style="background: var(--gray-bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin-top: 0;">
+    <div style="background: var(--white); padding: 40px; border-radius: 12px; max-width: 400px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.1);">
+      <h2 style="text-align: center; margin-bottom: 32px;">Вход в панель</h2>
+
+      <div class="form-group">
+        <label>Код доступа</label>
+        <input type="password" id="adminPassword" placeholder="Введите код доступа" onkeypress="if(event.key === 'Enter') login()">
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="login()">Вход</button>
+      <p id="loginError" style="color: var(--red); font-size: 13px; margin-top: 12px; text-align: center; display: none;">Неверный код доступа</p>
+    </div>
+  </section>
+
+  <!-- ADMIN PANEL -->
+  <section id="adminPanel" style="display: none; background: var(--white);">
+    <h2 class="section-title">Администраторская панель</h2>
+
+    <div class="admin-stats" id="adminStats">
+      <div class="admin-stat-card" data-role="admin">
+        <div class="stat-value" id="statColleagues">—</div>
+        <div class="stat-label">Коллег в базе</div>
+      </div>
+      <div class="admin-stat-card" data-role="admin">
+        <div class="stat-value" id="statAds">—</div>
+        <div class="stat-label">Объявлений</div>
+      </div>
+      <div class="admin-stat-card" data-role="admin">
+        <div class="stat-value" id="statBlacklist">—</div>
+        <div class="stat-label">В черном списке</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="stat-value" id="statBalance">—</div>
+        <div class="stat-label">Баланс кассы (₸)</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-bottom: 40px; justify-content: center; flex-wrap: wrap;" id="adminTabButtons">
+      <button class="btn-secondary tab-btn" data-tab="content" data-role="admin" onclick="showTab('content')">Контент</button>
+      <button class="btn-secondary tab-btn" data-tab="materials" data-role="admin" onclick="showTab('materials')">Материалы</button>
+      <button class="btn-secondary tab-btn" data-tab="marketplace" data-role="admin" onclick="showTab('marketplace')">Барахолка</button>
+      <button class="btn-secondary tab-btn" data-tab="treasury" data-role="any" onclick="showTab('treasury')">Касса</button>
+      <button class="btn-secondary tab-btn" data-tab="blacklist" data-role="admin" onclick="showTab('blacklist')">Черный список</button>
+      <button class="btn-secondary tab-btn" data-tab="colleagues" data-role="admin" onclick="showTab('colleagues')">Спецтехника</button>
+      <button class="btn-danger" onclick="logout()" style="margin-left: auto;">Выход</button>
+    </div>
+
+    <!-- CONTENT TAB -->
+    <div id="contentTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление контентом сайта</h3>
+
+      <div class="admin-two-col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Логотип и баннер -->
+        <div>
+          <h4 style="margin-bottom: 16px; font-size: 16px;">Логотип и баннер</h4>
+
+          <div style="background: var(--gray-bg); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">Логотип (круглое изображение)</label>
+            <input type="file" id="logoUpload" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+            <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="uploadLogo()">Загрузить логотип</button>
+          </div>
+
+          <div style="background: var(--gray-bg); padding: 16px; border-radius: 8px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">Баннер на главной</label>
+            <input type="file" id="bannerUpload" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+            <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="uploadBanner()">Загрузить баннер</button>
+          </div>
+        </div>
+
+        <!-- Текст на главной -->
+        <div>
+          <h4 style="margin-bottom: 16px; font-size: 16px;">Главная страница</h4>
+
+          <div style="background: var(--gray-bg); padding: 16px; border-radius: 8px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">Подзаголовок навигации</label>
+            <input type="text" id="navBrandText" placeholder='ОО "ВИРА МАИНА"' style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px;">
+            <button class="btn-primary" style="width: 100%;" onclick="updateNavBrandText()">Сохранить</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px;">
+        <h4 style="margin-bottom: 16px; font-size: 16px;">Карточки "Наши задачи"</h4>
+        <div id="tasksEditor" style="display: grid; gap: 16px;"></div>
+      </div>
+
+      <div style="margin-top: 30px; padding: 16px; background: var(--gray-bg); border-radius: 8px;">
+        <h4 style="margin-bottom: 12px; font-size: 16px;">Резервная копия</h4>
+        <button class="btn-secondary" onclick="downloadBackup()" style="width: 100%;">Скачать резервную копию данных</button>
+        <p style="font-size: 12px; color: var(--text-light); margin-top: 8px;">Содержит все данные о коллегах, объявлениях, кассе и чёрном списке</p>
+      </div>
+    </div>
+
+    <!-- МАТЕРИАЛЫ TAB -->
+    <div id="materialsTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление материалами</h3>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">Добавить новый материал</h4>
+
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="matTitle" placeholder="Техника безопасности при работе с кранами">
+        </div>
+
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="matDescription" placeholder="Краткое описание..." rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Тип</label>
+          <select id="matType">
+            <option value="video">Видео</option>
+            <option value="article">Статья</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>URL или ссылка</label>
+          <input type="text" id="matUrl" placeholder="https://www.youtube.com/embed/...">
+        </div>
+
+        <button class="btn-primary" onclick="addMaterial()">Добавить материал</button>
+      </div>
+
+      <h4 style="margin: 32px 0 16px;">Существующие материалы</h4>
+      <div id="materialsList" style="max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- БАРАХОЛКА TAB -->
+    <div id="marketplaceTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление объявлениями</h3>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">Новое объявление</h4>
+
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="admAdTitle" placeholder="Трос стальной 12мм (50м)">
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="admAdDescription" placeholder="Подробное описание товара..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Категория</label>
+          <select id="admAdCategory">
+            <option value="Тросы">Тросы</option>
+            <option value="Масла и жидкости">Масла и жидкости</option>
+            <option value="Запчасти">Запчасти</option>
+            <option value="Техника">Техника</option>
+            <option value="Прочее">Прочее</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Фото товара</label>
+          <input type="file" id="admAdPhoto" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Цена (₸)</label>
+          <input type="number" id="admAdPrice" placeholder="15000">
+        </div>
+        <div class="form-group">
+          <label>Имя автора</label>
+          <input type="text" id="admAdName" placeholder="Иван">
+        </div>
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" id="admAdPhone" placeholder="+7 (701) 123-45-67">
+        </div>
+
+        <button class="btn-primary" onclick="addMarketplaceAdmin()">Опубликовать</button>
+      </div>
+
+      <div id="marketplaceAdminList" style="max-height: 600px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- КАССА TAB -->
+    <div id="treasuryTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление кассой</h3>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;" data-role="admin">
+        <h4 style="margin-bottom: 16px;">Добавить запись</h4>
+
+        <div class="form-group">
+          <label>Дата</label>
+          <input type="date" id="treasDate">
+        </div>
+
+        <div class="form-group">
+          <label>Тип</label>
+          <select id="treasType">
+            <option value="income">Приход (доход)</option>
+            <option value="expense">Расход (трата)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Сумма (₸)</label>
+          <input type="number" id="treasAmount" placeholder="50000">
+        </div>
+
+        <div class="form-group">
+          <label>Описание</label>
+          <input type="text" id="treasDescription" placeholder="Взносы членов за январь">
+        </div>
+
+        <div class="form-group">
+          <label>Чек (Kaspi, фото или PDF)</label>
+          <label class="file-upload" for="treasReceiptInput">
+            <input type="file" id="treasReceiptInput" accept="image/*,application/pdf">
+            <div class="file-upload-label" id="treasReceiptLabel">Нажми, чтобы прикрепить чек</div>
+          </label>
+        </div>
+
+        <button class="btn-primary" onclick="addTreasuryEntry()">Добавить запись</button>
+      </div>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">Период и выписка</h4>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 14px;">Быстрые фильтры</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="setQuickFilter('week')" style="flex: 0 1 auto;">За неделю</button>
+            <button class="btn-secondary" onclick="setQuickFilter('month')" style="flex: 0 1 auto;">За месяц</button>
+            <button class="btn-secondary" onclick="setQuickFilter('quarter')" style="flex: 0 1 auto;">За 3 месяца</button>
+            <button class="btn-secondary" onclick="setQuickFilter('halfyear')" style="flex: 0 1 auto;">За полгода</button>
+            <button class="btn-secondary" onclick="setQuickFilter('year')" style="flex: 0 1 auto;">За год</button>
+            <button class="btn-danger" onclick="resetPeriodFilter()" style="flex: 0 1 auto;">Сбросить</button>
+          </div>
+        </div>
+
+        <div style="background: var(--white); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 14px;">За произвольный период</label>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+            <div style="flex: 1 1 140px;">
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">С даты</label>
+              <input type="date" id="periodFrom" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px;">
+            </div>
+            <div style="flex: 1 1 140px;">
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">По дату</label>
+              <input type="date" id="periodTo" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px;">
+            </div>
+            <button class="btn-primary" onclick="applyPeriodFilter()" style="height: 34px;">За период</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn-primary" onclick="exportTreasury('xlsx')">📥 Скачать Excel</button>
+          <button class="btn-primary" onclick="exportTreasury('doc')">📥 Скачать Word</button>
+        </div>
+      </div>
+
+      <h4 style="margin: 32px 0 16px;">История операций</h4>
+      <div id="treasuryList" style="max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- ЧЕРНЫЙ СПИСОК TAB -->
+    <div id="blacklistTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление черным списком</h3>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">Добавить компанию</h4>
+
+        <div class="form-group">
+          <label>Название компании</label>
+          <input type="text" id="admBlCompany" placeholder="ООО 'БыстроСтрой'">
+        </div>
+        <div class="form-group">
+          <label>Причина добавления</label>
+          <textarea id="admBlReason" placeholder="Задержка оплаты на 3 месяца, отказ платить..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Контакт (для справки)</label>
+          <input type="tel" id="admBlContact" placeholder="+7 (777) 123-45-67">
+        </div>
+
+        <button class="btn-primary" onclick="addBlacklistAdmin()">Добавить</button>
+      </div>
+
+      <h4 style="margin: 32px 0 16px;">Текущие записи</h4>
+      <div id="blacklistList" style="max-height: 400px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- КОЛЛЕГИ TAB -->
+    <div id="colleaguesTab" class="admin-tab" style="display: none;">
+      <h3 style="margin-bottom: 24px;">Управление спецтехникой</h3>
+
+      <div style="background: var(--gray-bg); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px;">Добавить технику</h4>
+
+        <div class="form-group">
+          <label>Имя</label>
+          <input type="text" id="admColName" placeholder="Иван Петров">
+        </div>
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" id="admColPhone" placeholder="+7 (701) 123-45-67">
+        </div>
+        <div class="form-group">
+          <label>Фото техники (можно несколько)</label>
+          <input type="file" id="admColPhotos" accept="image/*" multiple>
+        </div>
+
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Техника</label>
+        <div id="admCranesContainer"></div>
+        <button class="btn-secondary" onclick="addCraneFieldAdmin()">+ Добавить кран</button>
+
+        <button class="btn-primary" style="width: 100%; margin-top: 16px;" onclick="addColleagueAdmin()">Сохранить</button>
+      </div>
+
+      <h4 style="margin: 32px 0 16px;">Список участников</h4>
+      <div id="colleaguesList" style="max-height: 400px; overflow-y: auto;"></div>
+    </div>
+  </section>
+
+  <!-- MODAL: Редактировать объявление -->
+  <div id="editAdModal" class="modal" onclick="if(event.target === this) closeModal('editAdModal')">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('editAdModal')">&times;</span>
+      <h3 style="margin-bottom: 24px;">Редактировать объявление</h3>
+      <input type="hidden" id="editAdId">
+
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" id="editAdTitle">
+      </div>
+      <div class="form-group">
+        <label>Описание</label>
+        <textarea id="editAdDescription" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Категория</label>
+        <input type="text" id="editAdCategory">
+      </div>
+      <div class="form-group">
+        <label>Цена (₸)</label>
+        <input type="number" id="editAdPrice">
+      </div>
+      <div class="form-group">
+        <label>Имя автора</label>
+        <input type="text" id="editAdName">
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="tel" id="editAdPhone">
+      </div>
+      <div class="form-group">
+        <label>Заменить фото (необязательно)</label>
+        <input type="file" id="editAdPhoto" accept="image/*">
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="saveAdEdit()">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Редактировать запись кассы -->
+  <div id="editTreasuryModal" class="modal" onclick="if(event.target === this) closeModal('editTreasuryModal')">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('editTreasuryModal')">&times;</span>
+      <h3 style="margin-bottom: 24px;">Редактировать запись</h3>
+      <input type="hidden" id="editTreasId">
+
+      <div class="form-group">
+        <label>Дата</label>
+        <input type="date" id="editTreasDate">
+      </div>
+      <div class="form-group">
+        <label>Тип</label>
+        <select id="editTreasType">
+          <option value="income">Приход (доход)</option>
+          <option value="expense">Расход (трата)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Сумма (₸)</label>
+        <input type="number" id="editTreasAmount">
+      </div>
+      <div class="form-group">
+        <label>Описание</label>
+        <input type="text" id="editTreasDescription">
+      </div>
+      <div class="form-group">
+        <label>Заменить чек (необязательно)</label>
+        <input type="file" id="editTreasReceipt" accept="image/*,application/pdf">
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="saveTreasuryEdit()">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Редактировать материал -->
+  <div id="editMaterialModal" class="modal" onclick="if(event.target === this) closeModal('editMaterialModal')">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('editMaterialModal')">&times;</span>
+      <h3 style="margin-bottom: 24px;">Редактировать материал</h3>
+      <input type="hidden" id="editMatId">
+
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" id="editMatTitle">
+      </div>
+      <div class="form-group">
+        <label>Описание</label>
+        <textarea id="editMatDescription" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Тип</label>
+        <select id="editMatType">
+          <option value="video">Видео</option>
+          <option value="article">Статья</option>
+          <option value="pdf">PDF</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>URL или ссылка</label>
+        <input type="text" id="editMatUrl">
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="saveEditMaterial()">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Редактировать коллегу -->
+  <div id="editColleagueModal" class="modal" onclick="if(event.target === this) closeModal('editColleagueModal')">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('editColleagueModal')">&times;</span>
+      <h3 style="margin-bottom: 24px;">Редактировать спецтехнику</h3>
+      <input type="hidden" id="editColId">
+
+      <div class="form-group">
+        <label>Имя</label>
+        <input type="text" id="editColName">
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="tel" id="editColPhone">
+      </div>
+
+      <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Техника</label>
+      <div id="editColCranesContainer"></div>
+      <button type="button" class="btn-secondary" onclick="addEditCraneField()" style="width: 100%; margin-bottom: 16px;">+ Добавить кран</button>
+
+      <button class="btn-primary" style="width: 100%;" onclick="saveEditColleague()">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Редактировать черный список -->
+  <div id="editBlacklistModal" class="modal" onclick="if(event.target === this) closeModal('editBlacklistModal')">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('editBlacklistModal')">&times;</span>
+      <h3 style="margin-bottom: 24px;">Редактировать запись</h3>
+      <input type="hidden" id="editBlId">
+
+      <div class="form-group">
+        <label>Название компании</label>
+        <input type="text" id="editBlCompany">
+      </div>
+      <div class="form-group">
+        <label>Причина добавления</label>
+        <textarea id="editBlReason" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Контакт (для справки)</label>
+        <input type="tel" id="editBlContact">
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="saveEditBlacklist()">Сохранить</button>
+    </div>
+  </div>
+
+  <script>
+    let adminToken = localStorage.getItem('adminToken');
+    let adminRole = localStorage.getItem('adminRole');
+    let periodFrom = '';
+    let periodTo = '';
+
+    // Форматирование даты: YYYY-MM-DD -> DD.MM.YYYY
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}.${month}.${year}`;
+    }
+
+    // Быстрые фильтры
+    function setQuickFilter(type) {
+      const today = new Date();
+      let from = new Date();
+
+      if (type === 'week') from.setDate(today.getDate() - 7);
+      else if (type === 'month') from.setMonth(today.getMonth() - 1);
+      else if (type === 'quarter') from.setMonth(today.getMonth() - 3);
+      else if (type === 'halfyear') from.setMonth(today.getMonth() - 6);
+      else if (type === 'year') from.setFullYear(today.getFullYear() - 1);
+
+      const fromStr = from.toISOString().split('T')[0];
+      const toStr = today.toISOString().split('T')[0];
+
+      document.getElementById('periodFrom').value = fromStr;
+      document.getElementById('periodTo').value = toStr;
+      applyPeriodFilter();
+    }
+
+    if (adminToken) {
+      showAdminPanel();
+    }
+
+    async function login() {
+      const password = document.getElementById('adminPassword').value;
+      document.getElementById('loginError').style.display = 'none';
+
+      if (!password) {
+        alert('Введи код доступа!');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          adminToken = data.token;
+          adminRole = data.admin.role;
+          localStorage.setItem('adminToken', adminToken);
+          localStorage.setItem('adminRole', adminRole);
+          showAdminPanel();
+        } else {
+          document.getElementById('loginError').style.display = 'block';
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function applyRoleVisibility() {
+      const isFullAdmin = adminRole === 'admin';
+      document.querySelectorAll('[data-role="admin"]').forEach(el => {
+        el.style.display = isFullAdmin ? '' : 'none';
+      });
+    }
+
+    function showAdminPanel() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      applyRoleVisibility();
+      loadAllData();
+      loadStats();
+      showTab(adminRole === 'admin' ? 'materials' : 'treasury');
+    }
+
+    async function loadStats() {
+      try {
+        const headers = { 'Authorization': `Bearer ${adminToken}` };
+        const requests = [fetch('/api/treasury', { headers }).then(r => r.json())];
+
+        if (adminRole === 'admin') {
+          requests.push(
+            fetch('/api/colleagues').then(r => r.json()),
+            fetch('/api/marketplace').then(r => r.json()),
+            fetch('/api/blacklist').then(r => r.json())
+          );
+        }
+
+        const [treasury, colleagues, ads, blacklist] = await Promise.all(requests);
+
+        let balance = 0;
+        treasury.forEach(t => {
+          if (t.type === 'income') balance += Number(t.amount);
+          else if (t.type === 'expense') balance -= Number(t.amount);
+        });
+        document.getElementById('statBalance').textContent = balance.toLocaleString('ru-RU');
+
+        if (adminRole === 'admin') {
+          document.getElementById('statColleagues').textContent = colleagues.length;
+          document.getElementById('statAds').textContent = ads.length;
+          document.getElementById('statBlacklist').textContent = blacklist.length;
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminRole');
+      adminToken = null;
+      adminRole = null;
+      document.getElementById('loginSection').style.display = 'flex';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminPassword').value = '';
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.admin-tab').forEach(t => t.style.display = 'none');
+      document.getElementById(tab + 'Tab').style.display = 'block';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // ===== ЗАГРУЗКА ДАННЫХ =====
+    async function loadAllData() {
+      if (adminRole === 'admin') {
+        loadMaterials();
+        loadMarketplaceAdmin();
+        loadBlacklist();
+        loadColleagues();
+      }
+      loadTreasury();
+    }
+
+    // ===== МАТЕРИАЛЫ =====
+    let materialsCache = [];
+
+    async function loadMaterials() {
+      try {
+        const res = await fetch('/api/materials');
+        materialsCache = await res.json();
+        const list = document.getElementById('materialsList');
+        list.innerHTML = '';
+
+        materialsCache.forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.marginBottom = '12px';
+          div.innerHTML = `
+            <div class="admin-row" style="display: flex; justify-content: space-between; align-items: start;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-weight: 600;">${m.title}</p>
+                <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px;">${m.type}</p>
+              </div>
+              <div class="admin-row-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                <button class="btn-secondary" onclick="openEditMaterial(${m.id})">Редактировать</button>
+                <button class="btn-danger" onclick="deleteMaterial(${m.id})">Удалить</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function openEditMaterial(id) {
+      const material = materialsCache.find(m => m.id === id);
+      if (!material) return;
+
+      document.getElementById('editMatId').value = material.id;
+      document.getElementById('editMatTitle').value = material.title;
+      document.getElementById('editMatDescription').value = material.description;
+      document.getElementById('editMatType').value = material.type;
+      document.getElementById('editMatUrl').value = material.url;
+
+      document.getElementById('editMaterialModal').classList.add('open');
+    }
+
+    async function saveEditMaterial() {
+      const id = document.getElementById('editMatId').value;
+      const title = document.getElementById('editMatTitle').value;
+      const description = document.getElementById('editMatDescription').value;
+      const type = document.getElementById('editMatType').value;
+      const url = document.getElementById('editMatUrl').value;
+
+      if (!title || !description || !url) {
+        alert('Заполни все поля!');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/materials/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ title, description, type, url })
+        });
+
+        if (res.ok) {
+          alert('Материал обновлен!');
+          closeModal('editMaterialModal');
+          loadMaterials();
+        } else {
+          alert('Ошибка сохранения');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function addMaterial() {
+      const title = document.getElementById('matTitle').value;
+      const description = document.getElementById('matDescription').value;
+      const type = document.getElementById('matType').value;
+      const url = document.getElementById('matUrl').value;
+
+      if (!title || !description || !url) {
+        alert('Заполни все поля!');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/materials', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ title, description, type, url })
+        });
+
+        if (res.ok) {
+          alert('Материал добавлен!');
+          document.getElementById('matTitle').value = '';
+          document.getElementById('matDescription').value = '';
+          document.getElementById('matUrl').value = '';
+          loadMaterials();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function deleteMaterial(id) {
+      if (!confirm('Удалить этот материал?')) return;
+
+      try {
+        const res = await fetch(`/api/materials/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+          loadMaterials();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    // ===== БАРАХОЛКА =====
+    let marketplaceCache = [];
+
+    async function loadMarketplaceAdmin() {
+      try {
+        const res = await fetch('/api/marketplace');
+        marketplaceCache = await res.json();
+        const list = document.getElementById('marketplaceAdminList');
+        list.innerHTML = '';
+
+        marketplaceCache.forEach(ad => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.marginBottom = '12px';
+          div.innerHTML = `
+            <div class="admin-row" style="display: flex; justify-content: space-between; align-items: start; gap: 16px;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-weight: 600;">${ad.title}</p>
+                <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px;">${ad.category} • ${Number(ad.price).toLocaleString('ru-RU')} ₸ • ${ad.name}</p>
+              </div>
+              <div class="admin-row-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                <button class="btn-secondary" onclick="openEditAd(${ad.id})">Редактировать</button>
+                <button class="btn-danger" onclick="deleteAdAdmin(${ad.id})">Удалить</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+
+        if (marketplaceCache.length === 0) {
+          list.innerHTML = '<p class="empty-state">Объявлений пока нет</p>';
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function addMarketplaceAdmin() {
+      const title = document.getElementById('admAdTitle').value;
+      const description = document.getElementById('admAdDescription').value;
+      const category = document.getElementById('admAdCategory').value;
+      const price = document.getElementById('admAdPrice').value;
+      const name = document.getElementById('admAdName').value;
+      const phone = document.getElementById('admAdPhone').value;
+      const photoFile = document.getElementById('admAdPhoto').files[0];
+
+      if (!title || !description || !price || !name || !phone) {
+        alert('Заполни все поля!');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('category', category);
+        formData.append('price', price);
+        formData.append('name', name);
+        formData.append('phone', phone);
+        if (photoFile) formData.append('photo', photoFile);
+
+        const res = await fetch('/api/marketplace', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Объявление опубликовано!');
+          document.getElementById('admAdTitle').value = '';
+          document.getElementById('admAdDescription').value = '';
+          document.getElementById('admAdPrice').value = '';
+          document.getElementById('admAdName').value = '';
+          document.getElementById('admAdPhone').value = '';
+          document.getElementById('admAdPhoto').value = '';
+          loadMarketplaceAdmin();
+          loadStats();
+        } else {
+          alert('Ошибка публикации');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function openEditAd(id) {
+      const ad = marketplaceCache.find(a => a.id === id);
+      if (!ad) return;
+
+      document.getElementById('editAdId').value = ad.id;
+      document.getElementById('editAdTitle').value = ad.title;
+      document.getElementById('editAdDescription').value = ad.description;
+      document.getElementById('editAdCategory').value = ad.category;
+      document.getElementById('editAdPrice').value = ad.price;
+      document.getElementById('editAdName').value = ad.name;
+      document.getElementById('editAdPhone').value = ad.phone;
+      document.getElementById('editAdPhoto').value = '';
+
+      document.getElementById('editAdModal').classList.add('open');
+    }
+
+    async function saveAdEdit() {
+      const id = document.getElementById('editAdId').value;
+      const formData = new FormData();
+      formData.append('title', document.getElementById('editAdTitle').value);
+      formData.append('description', document.getElementById('editAdDescription').value);
+      formData.append('category', document.getElementById('editAdCategory').value);
+      formData.append('price', document.getElementById('editAdPrice').value);
+      formData.append('name', document.getElementById('editAdName').value);
+      formData.append('phone', document.getElementById('editAdPhone').value);
+
+      const photoFile = document.getElementById('editAdPhoto').files[0];
+      if (photoFile) formData.append('photo', photoFile);
+
+      try {
+        const res = await fetch(`/api/marketplace/${id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Объявление обновлено!');
+          closeModal('editAdModal');
+          loadMarketplaceAdmin();
+        } else {
+          alert('Ошибка сохранения');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function deleteAdAdmin(id) {
+      if (!confirm('Удалить это объявление?')) return;
+
+      try {
+        const res = await fetch(`/api/marketplace/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+          loadMarketplaceAdmin();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    // ===== КАССА =====
+    function buildPeriodQuery() {
+      const params = new URLSearchParams();
+      if (periodFrom) params.set('from', periodFrom);
+      if (periodTo) params.set('to', periodTo);
+      return params.toString();
+    }
+
+    async function loadTreasury() {
+      try {
+        const query = buildPeriodQuery();
+        const res = await fetch(`/api/treasury${query ? '?' + query : ''}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const entries = await res.json();
+        entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const list = document.getElementById('treasuryList');
+        list.innerHTML = '';
+
+        entries.forEach(e => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.marginBottom = '12px';
+          const type = e.type === 'income' ? 'Приход' : 'Расход';
+          const amount = e.type === 'income' ? '+' : '-';
+          const receiptHtml = e.receipt
+            ? `<a href="/uploads/${e.receipt}" target="_blank" style="font-size: 12px; color: var(--yellow-dark); text-decoration: none; font-weight: 600;">Открыть чек</a>`
+            : '<span style="font-size: 12px; color: var(--text-light);">Чека нет</span>';
+          const actionsHtml = adminRole === 'admin'
+            ? `<div class="admin-row-actions" style="display: flex; gap: 6px;">
+                 <button class="btn-secondary" onclick="openEditTreasury(${e.id})">Изм.</button>
+                 <button class="btn-danger" onclick="deleteTreasuryEntry(${e.id})">Удал.</button>
+               </div>`
+            : '';
+
+          div.innerHTML = `
+            <div class="admin-row" style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-weight: 600;">${e.description}</p>
+                <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px;">${formatDate(e.date)} • ${type} • ${e.createdBy || ''}</p>
+                <p style="margin: 6px 0 0;">${receiptHtml}</p>
+              </div>
+              <div style="text-align: right; flex-shrink: 0;">
+                <p style="margin: 0 0 8px; font-weight: 600; color: ${e.type === 'income' ? '#27ae60' : '#e74c3c'};">
+                  ${amount}${Number(e.amount).toLocaleString('ru-RU')} ₸
+                </p>
+                ${actionsHtml}
+              </div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+
+        if (entries.length === 0) {
+          list.innerHTML = '<p class="empty-state">Движений за выбранный период нет</p>';
+        }
+
+        window.treasuryCache = entries;
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function previewReceiptName() {
+      const file = document.getElementById('treasReceiptInput').files[0];
+      document.getElementById('treasReceiptLabel').textContent = file ? file.name : 'Нажми, чтобы прикрепить чек';
+    }
+    document.getElementById('treasReceiptInput').addEventListener('change', previewReceiptName);
+
+    async function addTreasuryEntry() {
+      const date = document.getElementById('treasDate').value;
+      const type = document.getElementById('treasType').value;
+      const amount = document.getElementById('treasAmount').value;
+      const description = document.getElementById('treasDescription').value;
+      const receiptFile = document.getElementById('treasReceiptInput').files[0];
+
+      if (!date || !amount || !description) {
+        alert('Заполни все поля!');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('date', date);
+        formData.append('type', type);
+        formData.append('amount', amount);
+        formData.append('description', description);
+        if (receiptFile) formData.append('receipt', receiptFile);
+
+        const res = await fetch('/api/treasury', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Запись добавлена!');
+          document.getElementById('treasDate').value = '';
+          document.getElementById('treasAmount').value = '';
+          document.getElementById('treasDescription').value = '';
+          document.getElementById('treasReceiptInput').value = '';
+          previewReceiptName();
+          loadTreasury();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function openEditTreasury(id) {
+      const entry = (window.treasuryCache || []).find(e => e.id === id);
+      if (!entry) return;
+
+      document.getElementById('editTreasId').value = entry.id;
+      document.getElementById('editTreasDate').value = entry.date;
+      document.getElementById('editTreasType').value = entry.type;
+      document.getElementById('editTreasAmount').value = entry.amount;
+      document.getElementById('editTreasDescription').value = entry.description;
+      document.getElementById('editTreasReceipt').value = '';
+
+      document.getElementById('editTreasuryModal').classList.add('open');
+    }
+
+    async function saveTreasuryEdit() {
+      const id = document.getElementById('editTreasId').value;
+      const formData = new FormData();
+      formData.append('date', document.getElementById('editTreasDate').value);
+      formData.append('type', document.getElementById('editTreasType').value);
+      formData.append('amount', document.getElementById('editTreasAmount').value);
+      formData.append('description', document.getElementById('editTreasDescription').value);
+
+      const receiptFile = document.getElementById('editTreasReceipt').files[0];
+      if (receiptFile) formData.append('receipt', receiptFile);
+
+      try {
+        const res = await fetch(`/api/treasury/${id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Запись обновлена!');
+          closeModal('editTreasuryModal');
+          loadTreasury();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function deleteTreasuryEntry(id) {
+      if (!confirm('Удалить эту запись?')) return;
+
+      try {
+        const res = await fetch(`/api/treasury/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+          loadTreasury();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function applyPeriodFilter() {
+      periodFrom = document.getElementById('periodFrom').value;
+      periodTo = document.getElementById('periodTo').value;
+      loadTreasury();
+    }
+
+    function resetPeriodFilter() {
+      periodFrom = '';
+      periodTo = '';
+      document.getElementById('periodFrom').value = '';
+      document.getElementById('periodTo').value = '';
+      loadTreasury();
+    }
+
+    async function exportTreasury(format) {
+      try {
+        const params = new URLSearchParams();
+        if (periodFrom) params.set('from', periodFrom);
+        if (periodTo) params.set('to', periodTo);
+        params.set('format', format);
+
+        const res = await fetch(`/api/treasury/export?${params.toString()}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (!res.ok) {
+          alert('Ошибка экспорта');
+          return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kassa.${format === 'doc' ? 'doc' : 'xlsx'}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error('Ошибка:', e);
+        alert('Ошибка экспорта');
+      }
+    }
+
+    // ===== ЧЕРНЫЙ СПИСОК =====
+    let blacklistCache = [];
+
+    async function loadBlacklist() {
+      try {
+        const res = await fetch('/api/blacklist');
+        blacklistCache = await res.json();
+        const list = document.getElementById('blacklistList');
+        list.innerHTML = '';
+
+        blacklistCache.forEach(e => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.marginBottom = '12px';
+          div.style.borderLeft = '4px solid var(--red)';
+
+          div.innerHTML = `
+            <div class="admin-row" style="display: flex; justify-content: space-between; align-items: start;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-weight: 600; color: var(--red);">${e.company}</p>
+                <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px;">${e.reason}</p>
+              </div>
+              <div class="admin-row-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                <button class="btn-secondary" onclick="openEditBlacklist(${e.id})">Редактировать</button>
+                <button class="btn-danger" onclick="deleteBlacklist(${e.id})">Удалить</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function openEditBlacklist(id) {
+      const entry = blacklistCache.find(e => e.id === id);
+      if (!entry) return;
+
+      document.getElementById('editBlId').value = entry.id;
+      document.getElementById('editBlCompany').value = entry.company;
+      document.getElementById('editBlReason').value = entry.reason;
+      document.getElementById('editBlContact').value = entry.contact || '';
+
+      document.getElementById('editBlacklistModal').classList.add('open');
+    }
+
+    async function saveEditBlacklist() {
+      const id = document.getElementById('editBlId').value;
+      const company = document.getElementById('editBlCompany').value;
+      const reason = document.getElementById('editBlReason').value;
+      const contact = document.getElementById('editBlContact').value;
+
+      if (!company || !reason) {
+        alert('Заполни название компании и причину!');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/blacklist/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ company, reason, contact })
+        });
+
+        if (res.ok) {
+          alert('Запись обновлена!');
+          closeModal('editBlacklistModal');
+          loadBlacklist();
+          loadStats();
+        } else {
+          alert('Ошибка сохранения');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function addBlacklistAdmin() {
+      const company = document.getElementById('admBlCompany').value;
+      const reason = document.getElementById('admBlReason').value;
+      const contact = document.getElementById('admBlContact').value;
+
+      if (!company || !reason) {
+        alert('Заполни название компании и причину!');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/blacklist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ company, reason, contact })
+        });
+
+        if (res.ok) {
+          alert('Компания добавлена в черный список.');
+          document.getElementById('admBlCompany').value = '';
+          document.getElementById('admBlReason').value = '';
+          document.getElementById('admBlContact').value = '';
+          loadBlacklist();
+          loadStats();
+        } else {
+          alert('Ошибка добавления');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function deleteBlacklist(id) {
+      if (!confirm('Удалить эту запись?')) return;
+
+      try {
+        const res = await fetch(`/api/blacklist/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+          loadBlacklist();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    // ===== КОЛЛЕГИ =====
+    let colleaguesCache = [];
+
+    async function loadColleagues() {
+      try {
+        const res = await fetch('/api/colleagues');
+        colleaguesCache = await res.json();
+        const list = document.getElementById('colleaguesList');
+        list.innerHTML = '';
+
+        colleaguesCache.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.marginBottom = '12px';
+
+          div.innerHTML = `
+            <div class="admin-row" style="display: flex; justify-content: space-between; align-items: start;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-weight: 600;">${c.name}</p>
+                <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px;">${c.phone} • ${c.cranes.length} кран(ов)</p>
+              </div>
+              <div class="admin-row-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                <button class="btn-secondary" onclick="openEditColleague(${c.id})">Редактировать</button>
+                <button class="btn-danger" onclick="deleteColleague(${c.id})">Удалить</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function openEditColleague(id) {
+      const colleague = colleaguesCache.find(c => c.id === id);
+      if (!colleague) return;
+
+      document.getElementById('editColId').value = colleague.id;
+      document.getElementById('editColName').value = colleague.name;
+      document.getElementById('editColPhone').value = colleague.phone;
+
+      const container = document.getElementById('editColCranesContainer');
+      container.innerHTML = '';
+      colleague.cranes.forEach(crane => {
+        const div = document.createElement('div');
+        div.className = 'crane-row';
+        div.innerHTML = `
+          <button type="button" class="remove-crane" onclick="this.parentElement.remove()">Удалить</button>
+          <div class="form-group">
+            <input type="text" class="editColCraneType" placeholder="Вид крана" value="${crane.type}">
+          </div>
+          <div class="form-group">
+            <input type="number" class="editColCraneTonnage" placeholder="Тоннаж" value="${crane.tonnage}">
+          </div>
+          <div class="form-group">
+            <input type="number" class="editColCraneReach" placeholder="Вылет стрелы" value="${crane.reach}">
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('editColleagueModal').classList.add('open');
+    }
+
+    async function saveEditColleague() {
+      const id = document.getElementById('editColId').value;
+      const name = document.getElementById('editColName').value;
+      const phone = document.getElementById('editColPhone').value;
+
+      if (!name || !phone) {
+        alert('Заполни имя и телефон!');
+        return;
+      }
+
+      const cranes = [];
+      document.querySelectorAll('#editColCranesContainer .crane-row').forEach(row => {
+        const type = row.querySelector('.editColCraneType').value;
+        const tonnage = row.querySelector('.editColCraneTonnage').value;
+        const reach = row.querySelector('.editColCraneReach').value;
+
+        if (type && tonnage && reach) {
+          cranes.push({ type, tonnage: parseInt(tonnage), reach: parseInt(reach) });
+        }
+      });
+
+      if (cranes.length === 0) {
+        alert('Добавь хотя бы один кран!');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('phone', phone);
+        formData.append('cranes', JSON.stringify(cranes));
+
+        const res = await fetch(`/api/colleagues/${id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Данные обновлены!');
+          closeModal('editColleagueModal');
+          loadColleagues();
+          loadStats();
+        } else {
+          alert('Ошибка сохранения');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    function addCraneFieldAdmin() {
+      const container = document.getElementById('admCranesContainer');
+      const div = document.createElement('div');
+      div.className = 'crane-row';
+      div.innerHTML = `
+        <button type="button" class="remove-crane" onclick="this.parentElement.remove()">Удалить</button>
+        <div class="form-group">
+          <input type="text" class="admCraneType" placeholder="Вид крана (Автокран, манипулятор и т.д.)">
+        </div>
+        <div class="form-group">
+          <input type="number" class="admCraneTonnage" placeholder="Тоннаж">
+        </div>
+        <div class="form-group">
+          <input type="number" class="admCraneReach" placeholder="Вылет стрелы">
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function addEditCraneField() {
+      const container = document.getElementById('editColCranesContainer');
+      const div = document.createElement('div');
+      div.className = 'crane-row';
+      div.innerHTML = `
+        <button type="button" class="remove-crane" onclick="this.parentElement.remove()">Удалить</button>
+        <div class="form-group">
+          <input type="text" class="editColCraneType" placeholder="Вид крана">
+        </div>
+        <div class="form-group">
+          <input type="number" class="editColCraneTonnage" placeholder="Тоннаж">
+        </div>
+        <div class="form-group">
+          <input type="number" class="editColCraneReach" placeholder="Вылет стрелы">
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    addCraneFieldAdmin();
+
+    async function addColleagueAdmin() {
+      const name = document.getElementById('admColName').value;
+      const phone = document.getElementById('admColPhone').value;
+      const photoFiles = Array.from(document.getElementById('admColPhotos').files).slice(0, 5);
+
+      if (!name || !phone) {
+        alert('Заполни имя и телефон!');
+        return;
+      }
+
+      const cranes = [];
+      document.querySelectorAll('#admCranesContainer .crane-row').forEach(row => {
+        const type = row.querySelector('.admCraneType').value;
+        const tonnage = row.querySelector('.admCraneTonnage').value;
+        const reach = row.querySelector('.admCraneReach').value;
+
+        if (type && tonnage && reach) {
+          cranes.push({ type, tonnage: parseInt(tonnage), reach: parseInt(reach) });
+        }
+      });
+
+      if (cranes.length === 0) {
+        alert('Добавь хотя бы один кран!');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('phone', phone);
+        formData.append('cranes', JSON.stringify(cranes));
+        photoFiles.forEach(file => formData.append('photos', file));
+
+        const res = await fetch('/api/colleagues', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('Техника добавлена в базу!');
+          document.getElementById('admColName').value = '';
+          document.getElementById('admColPhone').value = '';
+          document.getElementById('admColPhotos').value = '';
+          document.getElementById('admCranesContainer').innerHTML = '';
+          addCraneFieldAdmin();
+          loadColleagues();
+          loadStats();
+        } else {
+          alert('Ошибка добавления');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function deleteColleague(id) {
+      if (!confirm('Удалить этого участника?')) return;
+
+      try {
+        const res = await fetch(`/api/colleagues/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+          loadColleagues();
+          loadStats();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    // ===== КОНТЕНТ =====
+    async function uploadLogo() {
+      const file = document.getElementById('logoUpload').files[0];
+      if (!file) {
+        alert('Выбери файл!');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload-logo', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+        if (res.ok) {
+          alert('Логотип загружен!');
+          document.getElementById('logoUpload').value = '';
+          location.reload();
+        } else {
+          alert('Ошибка загрузки');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function uploadBanner() {
+      const file = document.getElementById('bannerUpload').files[0];
+      if (!file) {
+        alert('Выбери файл!');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload-banner', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` },
+          body: formData
+        });
+        if (res.ok) {
+          alert('Баннер загружен!');
+          document.getElementById('bannerUpload').value = '';
+          location.reload();
+        } else {
+          alert('Ошибка загрузки');
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function updateNavBrandText() {
+      const text = document.getElementById('navBrandText').value.trim();
+      if (!text) {
+        alert('Введи текст!');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ navBrandText: text })
+        });
+
+        if (res.ok) {
+          alert('Сохранено!');
+          location.reload();
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    async function downloadBackup() {
+      try {
+        const headers = { 'Authorization': `Bearer ${adminToken}` };
+        const colleagues = await fetch('/api/colleagues').then(r => r.json());
+        const marketplace = await fetch('/api/marketplace').then(r => r.json());
+        const treasury = await fetch('/api/treasury', { headers }).then(r => r.json());
+        const blacklist = await fetch('/api/blacklist').then(r => r.json());
+        const materials = await fetch('/api/materials').then(r => r.json());
+
+        const backup = {
+          timestamp: new Date().toISOString(),
+          colleagues,
+          marketplace,
+          treasury,
+          blacklist,
+          materials
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vira-mayna-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error('Ошибка:', e);
+        alert('Ошибка скачивания резервной копии');
+      }
+    }
+
+    function loadTasksEditor() {
+      const tasks = [
+        { id: 1, title: 'Сплотиться и помогать друг другу', desc: 'Работаем и живём рядом — держимся друг за друга в деле и в жизни' },
+        { id: 2, title: 'Адекватные цены', desc: 'Не демпингуем и не роняем расценки в ущерб коллегам по цеху' },
+        { id: 3, title: 'Защита от недобросовестных заказчиков', desc: 'Заступаемся в случае необходимости друг за друга' },
+        { id: 4, title: 'Взаимопомощь', desc: 'Поддержка при ЧП, поломке техники, болезни или семейных обстоятельствах' },
+        { id: 5, title: 'Прозрачность', desc: 'Баланс общего фонда и итоги голосований видны каждому участнику' },
+        { id: 6, title: 'Обмен опытом', desc: 'Общая база знаний: ремонт техники, законы РК, инструкции по ТБ' }
+      ];
+
+      const container = document.getElementById('tasksEditor');
+      container.innerHTML = '';
+
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background: var(--gray-bg); padding: 16px; border-radius: 8px;';
+        div.innerHTML = `
+          <p style="margin: 0 0 8px; font-weight: 600; font-size: 13px; color: var(--text-light);">Карточка ${task.id}</p>
+          <input type="text" value="${task.title}" placeholder="Заголовок" class="task-title-${task.id}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px;">
+          <textarea placeholder="Описание" class="task-desc-${task.id}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; min-height: 60px;">${task.desc}</textarea>
+        `;
+        container.appendChild(div);
+      });
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-primary';
+      btn.textContent = 'Сохранить все карточки';
+      btn.style.width = '100%';
+      btn.style.marginTop = '16px';
+      btn.onclick = () => alert('Редактирование карточек включено. Данные можно сохранить через API (пока демо)');
+      container.appendChild(btn);
+    }
+
+    // Set today's date by default
+    document.getElementById('treasDate').valueAsDate = new Date();
+
+    // Initialize first tab and load data
+    setTimeout(() => {
+      if (adminToken) {
+        loadAllData();
+        if (adminRole === 'admin') loadTasksEditor();
+      }
+    }, 100);
+  </script>
+</body>
+</html>

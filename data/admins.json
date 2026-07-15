@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "password": "12345",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "Бухгалтер",
+    "password": "54321",
+    "role": "accountant"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Техника безопасности при работе с кранами",
+    "description": "Полное видеоруководство по безопасности",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "createdAt": "2026-01-01"
+  },
+  {
+    "id": 2,
+    "title": "Ремонт гидравлики: инструкция",
+    "description": "Пошаговое видеоруководство по ремонту",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/9bZkp7q19f0",
+    "createdAt": "2026-01-03"
+  },
+  {
+    "id": 3,
+    "title": "Новые правила РК для водителей",
+    "description": "Обзор изменений в законодательстве",
+    "type": "article",
+    "url": "/articles/new-rules.html",
+    "createdAt": "2026-01-05"
+  }
+]

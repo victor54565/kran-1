@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Спецтехника - Клуб Крановщиков</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <a href="/" class="nav-logo">
+        <img src="/uploads/logo.png" alt="Вира Маина">
+      </a>
+      <div class="nav-brand-text nav-brand-desktop">Общественное объединение "ВИРА МАИНА"</div>
+      <div class="nav-brand-text nav-brand-mobile">ОО "ВИРА МАИНА"</div>
+    </div>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Главная</a></li>
+      <li><a href="/colleagues.html" class="active">Спецтехника</a></li>
+      <li><a href="/marketplace.html">Барахолка</a></li>
+      <li><a href="/blacklist.html">Черный список</a></li>
+      <li><a href="/materials.html">Материалы</a></li>
+      <li><a href="/about.html">О нас</a></li>
+      <li><a href="/admin.html">Админ</a></li>
+    </ul>
+  </nav>
+
+  <!-- SECTION -->
+  <section style="background: var(--white);">
+    <h2 class="section-title">База Техники Коллег</h2>
+    <div class="section-head" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 40px;">
+      <p class="section-subtitle" style="margin-bottom: 0;">Найди подходящую для тебя технику без посредников!</p>
+    </div>
+
+    <div id="colleaguesList" class="grid"></div>
+  </section>
+
+  <script>
+    function waLink(phone) {
+      let digits = (phone || '').replace(/\D/g, '');
+      if (digits.length === 11 && digits[0] === '8') digits = '7' + digits.slice(1);
+      return `https://wa.me/${digits}`;
+    }
+
+    // Загрузить коллег
+    async function loadColleagues() {
+      try {
+        const res = await fetch('/api/colleagues');
+        const colleagues = await res.json();
+        const list = document.getElementById('colleaguesList');
+        list.innerHTML = '';
+
+        colleagues.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const photosHtml = (c.photos && c.photos.length)
+            ? `<div class="card-photos">${c.photos.map(p => `<img src="/uploads/${p}" onclick="window.open('/uploads/${p}', '_blank')">`).join('')}</div>`
+            : '';
+
+          card.innerHTML = `
+            ${photosHtml}
+            <h3 style="margin-bottom: 12px;">${c.name}</h3>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+              <a href="tel:${c.phone}" style="color: var(--yellow-dark); text-decoration: none; font-weight: 600;">${c.phone}</a>
+              <a href="${waLink(c.phone)}" target="_blank" class="btn-whatsapp">Написать</a>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <h4 style="font-size: 14px; margin-bottom: 8px;">Техника:</h4>
+              ${c.cranes.map(crane => `
+                <div style="background: var(--gray-bg); padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+                  <strong>${crane.type}</strong> - ${crane.tonnage}т, вылет ${crane.reach}м
+                </div>
+              `).join('')}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+
+        if (colleagues.length === 0) {
+          list.innerHTML = '<p class="empty-state">Пока никого нет.</p>';
+        }
+      } catch (e) {
+        console.error('Ошибка:', e);
+      }
+    }
+
+    loadColleagues();
+  </script>
+</body>
+</html>
